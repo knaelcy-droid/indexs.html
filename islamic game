@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Pengetahuan Islam</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f3f7;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 10px;
+            width: 350px;
+            text-align: center;
+            box-shadow: 0px 5px 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .question {
+            font-size: 18px;
+            margin: 20px 0;
+        }
+        button {
+            width: 100%;
+            margin: 5px 0;
+            padding: 12px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #1e8449;
+        }
+        .next-btn {
+            background: #3498db;
+        }
+        .next-btn:hover {
+            background: #217dbb;
+        }
+        .restart {
+            background: #e67e22;
+        }
+        .restart:hover {
+            background: #ca6d1f;
+        }
+        .result {
+            font-size: 18px;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Kuis Islami</h1>
+
+    <div id="quiz-box">
+        <div class="question" id="question"></div>
+
+        <button onclick="answer(0)" id="btn0"></button>
+        <button onclick="answer(1)" id="btn1"></button>
+        <button onclick="answer(2)" id="btn2"></button>
+        <button onclick="answer(3)" id="btn3"></button>
+
+        <button class="next-btn" onclick="nextQuestion()" id="next-btn" style="display:none;">Pertanyaan Berikutnya</button>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <button class="restart" onclick="restart()" id="restart-btn" style="display:none;">Ulangi Kuis</button>
+</div>
+
+<script>
+    const questions = [
+        {
+            question: "Siapakah nabi pertama?",
+            answers: ["Nabi Muhammad", "Nabi Adam", "Nabi Ibrahim", "Nabi Musa"],
+            correct: 1
+        },
+        {
+            question: "Kitab suci umat Islam adalah?",
+            answers: ["Injil", "Zabur", "Al-Qur'an", "Taurat"],
+            correct: 2
+        },
+        {
+            question: "Umat Islam berpuasa pada bulan?",
+            answers: ["Ramadhan", "Syawal", "Dzulhijjah", "Rabiul Awal"],
+            correct: 0
+        },
+        {
+            question: "Kota tempat lahir Nabi Muhammad adalah?",
+            answers: ["Madinah", "Baghdad", "Kairo", "Mekkah"],
+            correct: 3
+        }
+    ];
+
+    let index = 0;
+    let score = 0;
+
+    function showQuestion() {
+        document.getElementById("question").textContent = questions[index].question;
+        document.getElementById("btn0").textContent = questions[index].answers[0];
+        document.getElementById("btn1").textContent = questions[index].answers[1];
+        document.getElementById("btn2").textContent = questions[index].answers[2];
+        document.getElementById("btn3").textContent = questions[index].answers[3];
+        document.getElementById("result").textContent = "";
+        document.getElementById("next-btn").style.display = "none";
+    }
+
+    function answer(choice) {
+        if (choice === questions[index].correct) {
+            document.getElementById("result").textContent = "Benar!";
+            document.getElementById("result").style.color = "#27ae60";
+            score++;
+        } else {
+            document.getElementById("result").textContent = "Salah!";
+            document.getElementById("result").style.color = "#e74c3c";
+        }
+        document.getElementById("next-btn").style.display = "block";
+    }
+
+    function nextQuestion() {
+        index++;
+        if (index < questions.length) {
+            showQuestion();
+        } else {
+            showFinal();
+        }
+    }
+
+    function showFinal() {
+        document.getElementById("quiz-box").innerHTML =
+            `<h2>Nilai Kamu: ${score} dari ${questions.length}</h2>`;
+        document.getElementById("restart-btn").style.display = "block";
+    }
+
+    function restart() {
+        index = 0;
+        score = 0;
+        document.getElementById("restart-btn").style.display = "none";
+        location.reload();
+    }
+
+    showQuestion();
+</script>
+
+</body>
+</html>
