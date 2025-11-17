@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Kuis Islami untuk SMA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a5e1a, #0d8b0d);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header {
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            color: #FFD700;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .active {
+            display: block;
+        }
+
+        .start-screen button, .end-screen button {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #1a5e1a;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .start-screen button:hover, .end-screen button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px 20px;
+            border-radius: 50px;
+        }
+
+        .question-container {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .question-number {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            background: #FFD700;
+            color: #1a5e1a;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 1.3rem;
+            line-height: 1.5;
+        }
+
+        .options-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .option {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .option.correct {
+            background: rgba(0, 255, 0, 0.3);
+            border-color: #00ff00;
+            animation: pulse 0.5s;
+        }
+
+        .option.wrong {
+            background: rgba(255, 0, 0, 0.3);
+            border-color: #ff0000;
+            animation: shake 0.5s;
+        }
+
+        .option-letter {
+            background: #FFD700;
+            color: #1a5e1a;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .progress-container {
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD700, #FFA500);
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+        .end-screen h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #FFD700;
+        }
+
+        .score {
+            font-size: 5rem;
+            font-weight: bold;
+            color: #FFD700;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .result-message {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .achievement {
+            background: rgba(255, 215, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid #FFD700;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .controls button {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .controls button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .decoration {
+            position: absolute;
+            font-size: 8rem;
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        .decoration-1 {
+            top: 10px;
+            left: 10px;
+        }
+
+        .decoration-2 {
+            bottom: 10px;
+            right: 10px;
+        }
+
+        .audio-control {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .options-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .question-text {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="decoration decoration-1">ﷲ</div>
+        <div class="decoration decoration-2">ﷺ</div>
+        
+        <div class="audio-control" id="audioToggle">🔊</div>
+        
+        <!-- Start Screen -->
+        <div class="screen start-screen active">
+            <div class="header">
+                <h1>KUIS ISLAMI UNTUK SMA</h1>
+                <p>Uji pengetahuan agama Islam Anda dengan 25 soal menarik!</p>
+            </div>
+            <div class="start-content">
+                <p>Selamat datang di Game Kuis Islami! Jawab 25 pertanyaan seputar akidah, sejarah Islam, fiqih, akhlak, dan Al-Qur'an.</p>
+                <p>Dapatkan skor tertinggi dan raih predikat Mumtaz!</p>
+                <button id="startButton">Mulai Kuis</button>
+            </div>
+        </div>
+        
+        <!-- Game Screen -->
+        <div class="screen game-screen">
+            <div class="game-info">
+                <div class="score-display">Skor: <span id="currentScore">0</span></div>
+                <div class="question-count">Soal: <span id="currentQuestion">1</span>/25</div>
+                <div class="timer">Waktu: <span id="timeLeft">30</span>s</div>
+            </div>
+            
+            <div class="question-container">
+                <div class="question-number" id="questionNumber">1</div>
+                <div class="question-text" id="questionText">Memuat pertanyaan...</div>
+            </div>
+            
+            <div class="options-container" id="optionsContainer">
+                <!-- Opsi akan diisi oleh JavaScript -->
+            </div>
+            
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress" id="progressBar"></div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button id="hintButton">Petunjuk</button>
+                <button id="nextButton" disabled>Lanjut</button>
+            </div>
+        </div>
+        
+        <!-- End Screen -->
+        <div class="screen end-screen">
+            <div class="header">
+                <h1>SELESAI!</h1>
+            </div>
+            <div class="score" id="finalScore">0</div>
+            <div class="result-message" id="resultMessage">Memuat hasil...</div>
+            <div class="achievement" id="achievement">Pencapaian akan muncul di sini</div>
+            <div class="end-content">
+                <p>Terima kasih telah menyelesaikan Kuis Islami!</p>
+                <button id="restartButton">Main Lagi</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Soal kuis Islami untuk SMA
+        const questions = [
+            {
+                question: "Berapa kali dalam sehari semalam umat Islam diwajibkan shalat fardhu?",
+                options: ["3 kali", "4 kali", "5 kali", "6 kali"],
+                correctAnswer: 2,
+                hint: "Shalat fardhu terdiri dari Subuh, Dzuhur, Ashar, Maghrib, dan Isya"
+            },
+            {
+                question: "Siapakah khalifah pertama setelah wafatnya Nabi Muhammad SAW?",
+                options: ["Umar bin Khattab", "Abu Bakar Ash-Shiddiq", "Utsman bin Affan", "Ali bin Abi Thalib"],
+                correctAnswer: 1,
+                hint: "Dia adalah ayah mertua Nabi Muhammad SAW"
+            },
+            {
+                question: "Surah Al-Kautsar terdiri dari berapa ayat?",
+                options: ["2 ayat", "3 ayat", "4 ayat", "5 ayat"],
+                correctAnswer: 1,
+                hint: "Surah ini adalah surah terpendek dalam Al-Qur'an"
+            },
+            {
+                question: "Berapa jumlah rakaat shalat Subuh?",
+                options: ["2 rakaat", "3 rakaat", "4 rakaat", "5 rakaat"],
+                correctAnswer: 0,
+                hint: "Shalat Subuh adalah shalat fardhu dengan rakaat paling sedikit"
+            },
+            {
+                question: "Siapakah nama malaikat yang bertugas menyampaikan wahyu?",
+                options: ["Mikail", "Izrail", "Israfil", "Jibril"],
+                correctAnswer: 3,
+                hint: "Malaikat ini juga dikenal sebagai Ruhul Qudus"
+            },
+            {
+                question: "Pada bulan apa umat Islam melaksanakan puasa Ramadhan?",
+                options: ["Syawal", "Rajab", "Ramadhan", "Dzulhijjah"],
+                correctAnswer: 2,
+                hint: "Bulan ini adalah bulan ke-9 dalam kalender Hijriyah"
+            },
+            {
+                question: "Berapa jumlah nabi dan rasul yang wajib diketahui?",
+                options: ["5", "15", "25", "35"],
+                correctAnswer: 2,
+                hint: "Jumlah ini disebutkan dalam Al-Qur'an"
+            },
+            {
+                question: "Apa nama kitab suci yang diturunkan kepada Nabi Musa AS?",
+                options: ["Injil", "Zabur", "Taurat", "Al-Qur'an"],
+                correctAnswer: 2,
+                hint: "Kitab ini berisi 10 perintah Allah"
+            },
+            {
+                question: "Siapakah istri pertama Nabi Muhammad SAW?",
+                options: ["Aisyah RA", "Khadijah RA", "Hafsah RA", "Zainab RA"],
+                correctAnswer: 1,
+                hint: "Dia adalah seorang pengusaha sukses sebelum menikah dengan Nabi"
+            },
+            {
+                question: "Berapa jumlah huruf hijaiyah?",
+                options: ["26", "28", "30", "32"],
+                correctAnswer: 1,
+                hint: "Huruf-huruf ini membentuk tulisan Arab"
+            },
+            {
+                question: "Apa nama peristiwa hijrahnya Nabi Muhammad SAW dari Mekah ke Madinah?",
+                options: ["Isra' Mi'raj", "Hijrah", "Bai'at Aqabah", "Fathu Mekah"],
+                correctAnswer: 1,
+                hint: "Peristiwa ini menjadi awal penanggalan kalender Hijriyah"
+            },
+            {
+                question: "Berapa jumlah surah dalam Al-Qur'an?",
+                options: ["114", "124", "134", "144"],
+                correctAnswer: 0,
+                hint: "Surah pertama adalah Al-Fatihah dan terakhir adalah An-Nas"
+            },
+            {
+                question: "Siapakah sahabat Nabi yang menjadi muadzin pertama?",
+                options: ["Bilal bin Rabah", "Abu Bakar Ash-Shiddiq", "Umar bin Khattab", "Abdullah bin Mas'ud"],
+                correctAnswer: 0,
+                hint: "Dia adalah seorang budak yang dimerdekakan oleh Abu Bakar"
+            },
+            {
+                question: "Apa nama gunung tempat Nabi Muhammad SAW pertama kali menerima wahyu?",
+                options: ["Gunung Uhud", "Gunung Hira", "Gunung Arafah", "Gunung Sinai"],
+                correctAnswer: 1,
+                hint: "Gunung ini terletak di dekat kota Mekah"
+            },
+            {
+                question: "Berapa kali umat Islam melaksanakan ibadah haji dalam setahun?",
+                options: ["1 kali", "2 kali", "3 kali", "4 kali"],
+                correctAnswer: 0,
+                hint: "Ibadah ini dilaksanakan pada bulan Dzulhijjah"
+            },
+            {
+                question: "Siapakah nama nabi yang membangun Ka'bah bersama putranya?",
+                options: ["Nabi Adam AS", "Nabi Ibrahim AS", "Nabi Nuh AS", "Nabi Musa AS"],
+                correctAnswer: 1,
+                hint: "Nabi ini dikenal sebagai bapak para nabi"
+            },
+            {
+                question: "Apa nama ibadah sunnah yang dilaksanakan pada bulan Ramadhan setelah shalat Isya?",
+                options: ["Shalat Dhuha", "Shalat Tarawih", "Shalat Witir", "Shalat Tahajud"],
+                correctAnswer: 1,
+                hint: "Shalat ini biasanya dilaksanakan berjamaah di masjid"
+            },
+            {
+                question: "Berapa jumlah rukun Islam?",
+                options: ["3", "4", "5", "6"],
+                correctAnswer: 2,
+                hint: "Rukun pertama adalah syahadat"
+            },
+            {
+                question: "Siapakah nama ibu Nabi Muhammad SAW?",
+                options: ["Aminah", "Halimah", "Khadijah", "Aisyah"],
+                correctAnswer: 0,
+                hint: "Dia wafat ketika Nabi Muhammad SAW berusia 6 tahun"
+            },
+            {
+                question: "Apa nama peristiwa perjalanan Nabi Muhammad SAW dari Masjidil Haram ke Masjidil Aqsa?",
+                options: ["Hijrah", "Isra'", "Mi'raj", "Bai'at"],
+                correctAnswer: 1,
+                hint: "Peristiwa ini terjadi dalam satu malam"
+            },
+            {
+                question: "Berapa jumlah ayat dalam surah Al-Fatihah?",
+                options: ["5 ayat", "6 ayat", "7 ayat", "8 ayat"],
+                correctAnswer: 2,
+                hint: "Surah ini disebut juga Ummul Qur'an (induk Al-Qur'an)"
+            },
+            {
+                question: "Siapakah nama malaikat yang bertugas meniup sangkakala?",
+                options: ["Mikail", "Izrail", "Israfil", "Jibril"],
+                correctAnswer: 2,
+                hint: "Malaikat ini akan meniup sangkakala pada hari kiamat"
+            },
+            {
+                question: "Apa nama zakat yang wajib dikeluarkan saat Idul Fitri?",
+                options: ["Zakat Mal", "Zakat Fitrah", "Zakat Profesi", "Zakat Pertanian"],
+                correctAnswer: 1,
+                hint: "Zakat ini berupa bahan makanan pokok"
+            },
+            {
+                question: "Berapa jumlah rakaat shalat Maghrib?",
+                options: ["2 rakaat", "3 rakaat", "4 rakaat", "5 rakaat"],
+                correctAnswer: 1,
+                hint: "Shalat ini dilaksanakan setelah matahari terbenam"
+            },
+            {
+                question: "Siapakah nama nabi terakhir?",
+                options: ["Nabi Isa AS", "Nabi Musa AS", "Nabi Muhammad SAW", "Nabi Ibrahim AS"],
+                correctAnswer: 2,
+                hint: "Dia adalah penutup para nabi dan rasul"
+            }
+        ];
+
+        // Variabel game
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let timeLeft = 30;
+        let timer;
+        let audioEnabled = true;
+
+        // Elemen DOM
+        const startScreen = document.querySelector('.start-screen');
+        const gameScreen = document.querySelector('.game-screen');
+        const endScreen = document.querySelector('.end-screen');
+        const startButton = document.getElementById('startButton');
+        const nextButton = document.getElementById('nextButton');
+        const hintButton = document.getElementById('hintButton');
+        const restartButton = document.getElementById('restartButton');
+        const audioToggle = document.getElementById('audioToggle');
+        const questionText = document.getElementById('questionText');
+        const questionNumber = document.getElementById('questionNumber');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const currentScore = document.getElementById('currentScore');
+        const currentQuestion = document.getElementById('currentQuestion');
+        const timeLeftElement = document.getElementById('timeLeft');
+        const progressBar = document.getElementById('progressBar');
+        const finalScore = document.getElementById('finalScore');
+        const resultMessage = document.getElementById('resultMessage');
+        const achievement = document.getElementById('achievement');
+
+        // Fungsi untuk memulai game
+        function startGame() {
+            currentQuestionIndex = 0;
+            score = 0;
+            timeLeft = 30;
+            
+            startScreen.classList.remove('active');
+            gameScreen.classList.add('active');
+            
+            updateScore();
+            loadQuestion();
+            startTimer();
+            
+            // Putar audio latar (simulasi)
+            if (audioEnabled) {
+                // Di sini akan ada kode untuk memutar audio
+                console.log("Memutar audio latar...");
+            }
+        }
+
+        // Fungsi untuk memuat pertanyaan
+        function loadQuestion() {
+            const question = questions[currentQuestionIndex];
+            questionText.textContent = question.question;
+            questionNumber.textContent = currentQuestionIndex + 1;
+            currentQuestion.textContent = currentQuestionIndex + 1;
+            
+            // Update progress bar
+            progressBar.style.width = `${((currentQuestionIndex + 1) / questions.length) * 100}%`;
+            
+            // Kosongkan opsi sebelumnya
+            optionsContainer.innerHTML = '';
+            
+            // Tambahkan opsi baru
+            const optionLetters = ['A', 'B', 'C', 'D'];
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.classList.add('option');
+                optionElement.innerHTML = `
+                    <div class="option-letter">${optionLetters[index]}</div>
+                    <div class="option-text">${option}</div>
+                `;
+                
+                optionElement.addEventListener('click', () => selectOption(index));
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            // Reset tombol
+            nextButton.disabled = true;
+            hintButton.disabled = false;
+        }
+
+        // Fungsi untuk memilih opsi
+        function selectOption(selectedIndex) {
+            const question = questions[currentQuestionIndex];
+            const options = document.querySelectorAll('.option');
+            
+            // Nonaktifkan semua opsi
+            options.forEach(option => {
+                option.style.pointerEvents = 'none';
+            });
+            
+            // Tandai jawaban yang benar dan salah
+            options[selectedIndex].classList.add(selectedIndex === question.correctAnswer ? 'correct' : 'wrong');
+            options[question.correctAnswer].classList.add('correct');
+            
+            // Update skor jika benar
+            if (selectedIndex === question.correctAnswer) {
+                score += 10;
+                updateScore();
+                
+                // Putar suara benar (simulasi)
+                if (audioEnabled) {
+                    console.log("Memutar suara jawaban benar...");
+                }
+            } else {
+                // Putar suara salah (simulasi)
+                if (audioEnabled) {
+                    console.log("Memutar suara jawaban salah...");
+                }
+            }
+            
+            // Aktifkan tombol lanjut
+            nextButton.disabled = false;
+            hintButton.disabled = true;
+            
+            // Hentikan timer
+            clearInterval(timer);
+        }
+
+        // Fungsi untuk menampilkan petunjuk
+        function showHint() {
+            const question = questions[currentQuestionIndex];
+            alert(`Petunjuk: ${question.hint}`);
+            hintButton.disabled = true;
+        }
+
+        // Fungsi untuk pindah ke pertanyaan berikutnya
+        function nextQuestion() {
+            currentQuestionIndex++;
+            
+            if (currentQuestionIndex < questions.length) {
+                timeLeft = 30;
+                timeLeftElement.textContent = timeLeft;
+                loadQuestion();
+                startTimer();
+            } else {
+                endGame();
+            }
+        }
+
+        // Fungsi untuk mengakhiri game
+        function endGame() {
+            gameScreen.classList.remove('active');
+            endScreen.classList.add('active');
+            
+            finalScore.textContent = score;
+            
+            // Tentukan pesan hasil berdasarkan skor
+            let message = "";
+            let achievementText = "";
+            
+            if (score >= 230) {
+                message = "MUMTAZ (Luar Biasa)! Pengetahuan agama Anda sangat mengagumkan!";
+                achievementText = "Anda berhasil meraih predikat tertinggi!";
+            } else if (score >= 180) {
+                message = "JAYYID JIDDAN (Sangat Baik)! Pengetahuan agama Anda sangat baik!";
+                achievementText = "Hampir sempurna! Terus tingkatkan pengetahuan agama Anda.";
+            } else if (score >= 130) {
+                message = "JAYYID (Baik)! Pengetahuan agama Anda sudah baik.";
+                achievementText = "Lanjutkan belajar untuk meningkatkan pemahaman agama.";
+            } else if (score >= 80) {
+                message = "MAQBUL (Cukup). Pengetahuan agama Anda perlu ditingkatkan.";
+                achievementText = "Jangan menyerah, teruslah belajar agama Islam.";
+            } else {
+                message = "RADA' (Kurang). Anda perlu belajar lebih giat lagi.";
+                achievementText = "Mulailah belajar agama Islam dari dasar dan konsisten.";
+            }
+            
+            resultMessage.textContent = message;
+            achievement.textContent = achievementText;
+            
+            // Putar suara selesai (simulasi)
+            if (audioEnabled) {
+                console.log("Memutar suara selesai kuis...");
+            }
+        }
+
+        // Fungsi untuk memulai timer
+        function startTimer() {
+            clearInterval(timer);
+            timeLeft = 30;
+            timeLeftElement.textContent = timeLeft;
+            
+            timer = setInterval(() => {
+                timeLeft--;
+                timeLeftElement.textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    // Otomatis pindah ke pertanyaan berikutnya
+                    nextQuestion();
+                }
+            }, 1000);
+        }
+
+        // Fungsi untuk memperbarui skor
+        function updateScore() {
+            currentScore.textContent = score;
+        }
+
+        // Fungsi untuk mengulang game
+        function restartGame() {
+            endScreen.classList.remove('active');
+            startScreen.classList.add('active');
+        }
+
+        // Fungsi untuk mengaktifkan/menonaktifkan audio
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            audioToggle.textContent = audioEnabled ? "🔊" : "🔇";
+            
+            if (audioEnabled) {
+                console.log("Audio diaktifkan");
+            } else {
+                console.log("Audio dinonaktifkan");
+            }
+        }
+
+        // Event listeners
+        startButton.addEventListener('click', startGame);
+        nextButton.addEventListener('click', nextQuestion);
+        hintButton.addEventListener('click', showHint);
+        restartButton.addEventListener('click', restartGame);
+        audioToggle.addEventListener('click', toggleAudio);
+    </script>
+</body>
+</html>
