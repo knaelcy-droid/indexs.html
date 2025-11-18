@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BIO-QUEST — The Living Universe Adventure</title>
+  <style>
+    /* ---------- Base & Theme ---------- */
+    :root{
+      --bg:#071023; --card:#0e1724; --accent:#39f0d6; --accent2:#7b61ff; --muted:#98a0b3;
+      --glass: rgba(255,255,255,0.03);
+    }
+    *{box-sizing:border-box; font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial}
+    html,body{height:100%; margin:0; background: radial-gradient(1200px 600px at 10% 10%, rgba(59,130,246,0.06), transparent), linear-gradient(180deg, #020412 0%, #071023 100%); color:#dfe9f3}
+    .app{display:flex;min-height:100vh;align-items:center;justify-content:center;padding:28px}
+    .shell{width:1100px;max-width:98%;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:18px;box-shadow:0 10px 40px rgba(2,6,23,0.6);overflow:hidden;display:grid;grid-template-columns:360px 1fr}
+    /* ---------- Sidebar ---------- */
+    .sidebar{padding:22px;background:linear-gradient(180deg, rgba(11,18,30,0.6), rgba(8,12,20,0.5));backdrop-filter:blur(6px)}
+    .logo{display:flex;gap:12px;align-items:center;margin-bottom:18px}
+    .logo .mark{width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:700;box-shadow:0 6px 18px rgba(59,130,246,0.18)}
+    h1.title{font-size:18px;margin:0}
+    p.credit{color:var(--muted);font-size:12px;margin-top:6px}
+    .menu{margin-top:18px;display:flex;flex-direction:column;gap:10px}
+    .menu button{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:12px;border-radius:10px;color:var(--accent);text-align:left;cursor:pointer;display:flex;gap:12px;align-items:center}
+    .menu button.active{background:linear-gradient(90deg, rgba(57,240,214,0.06), rgba(123,97,255,0.04));border-color:rgba(123,97,255,0.18);box-shadow:0 6px 18px rgba(123,97,255,0.06)}
+    .muteRow{display:flex;gap:10px;margin-top:14px;align-items:center}
+    input[type=range]{width:100%}
+    /* ---------- Main ---------- */
+    .main{padding:28px}
+    .topbar{display:flex;justify-content:space-between;align-items:center}
+    .world-map{margin-top:20px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .zone{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:18px;cursor:pointer;border:1px solid rgba(255,255,255,0.03);position:relative;overflow:hidden}
+    .zone h3{margin:0 0 8px 0}
+    .zone p{margin:0;color:var(--muted);font-size:13px}
+    .particle{position:absolute;right:-40px;top:-40px;width:160px;height:160px;opacity:0.06}
+    /* ---------- Card & Game area ---------- */
+    .card{margin-top:18px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+    .question{font-size:18px;margin-bottom:12px}
+    .choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .choice{padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);cursor:pointer;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent)}
+    .choice.correct{outline:3px solid rgba(57,240,214,0.18)}
+    .choice.wrong{animation:shake 620ms}
+    @keyframes shake{0%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(2px)}100%{transform:translateX(0)}}
+    .hud{display:flex;gap:12px;align-items:center}
+    .meter{background:var(--glass);padding:8px;border-radius:8px;font-size:13px;color:var(--muted)}
+    .footerCredit{position:absolute;left:18px;bottom:14px;color:var(--muted);font-size:12px}
+    .bigMap{display:flex;gap:12px;align-items:center}
+
+    /* Mini Games Styles */
+    .game-container { 
+      position: relative; 
+      height: 160px; 
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+      border: 1px solid rgba(255,255,255,0.05);
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .game-ground { 
+      position: absolute; 
+      bottom: 0; 
+      width: 100%; 
+      height: 10px; 
+      background: var(--muted); 
+    }
+    .game-player { 
+      width: 20px; 
+      height: 20px; 
+      background: var(--accent); 
+      position: absolute; 
+      bottom: 10px; 
+      left: 50px; 
+      border-radius: 4px; 
+      transition: bottom 0.3s ease; 
+    }
+    .game-obstacle { 
+      width: 15px; 
+      height: 30px; 
+      background: var(--accent2); 
+      position: absolute; 
+      bottom: 10px; 
+      right: 0; 
+      border-radius: 2px; 
+    }
+    .dna-target { 
+      position: absolute; 
+      cursor: pointer; 
+      border-radius: 50%; 
+    }
+    .game-score { 
+      margin-top: 10px; 
+      font-weight: bold; 
+    }
+
+    /* responsive */
+    @media(max-width:900px){.shell{grid-template-columns:1fr}.sidebar{display:none}}
+  
+    /* --- Enhanced Animations --- */
+    @keyframes floatDNA { 0%{transform:translateY(0) rotate(0deg);} 50%{transform:translateY(-12px) rotate(6deg);} 100%{transform:translateY(0) rotate(0deg);} }
+    @keyframes pulseGlow { 0%{box-shadow:0 0 10px #00eaff;} 50%{box-shadow:0 0 25px #00eaff;} 100%{box-shadow:0 0 10px #00eaff;} }
+    @keyframes slideFadeIn { 0%{opacity:0; transform:translateY(40px);} 100%{opacity:1; transform:translateY(0);} }
+    @keyframes rotateHelix { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
+
+    .dna-float { animation: floatDNA 4s ease-in-out infinite; }
+    .glow-pulse { animation: pulseGlow 2.5s infinite; }
+    .slide-in { animation: slideFadeIn 1s ease forwards; }
+    .helix-spin { animation: rotateHelix 14s linear infinite; }
+  </style>
+</head>
+<body class="slide-in">
+  <div class="app">
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="logo">
+          <div class="mark">BQ</div>
+          <div>
+            <h1 class="title">BIO-QUEST</h1>
+            <p class="credit">The Living Universe Adventure</p>
+          </div>
+        </div>
+        <div class="menu" id="menu">
+          <button data-screen="home" class="active">World Map</button>
+          <button data-screen="play">Play Zone</button>
+          <button data-screen="minigames">Mini Games</button>
+          <button data-screen="leader">Leaderboard</button>
+          <button data-screen="credits">Credits</button>
+        </div>
+        <div class="muteRow">
+          <label style="font-size:13px;color:var(--muted);">Volume</label>
+          <input id="vol" type="range" min="0" max="1" step="0.01" value="0.6">
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px">
+          <button id="btnMute">Mute</button>
+          <button id="btnTheme">Mode</button>
+        </div>
+        <div class="footerCredit">Dibuat oleh Nasrul & Dwi – SMAN KABUH JOMBANG 2025</div>
+      </aside>
+
+      <main class="main">
+        <div class="topbar">
+          <div class="hud">
+            <div class="meter">XP: <span id="xp">0</span></div>
+            <div class="meter">Nucleus Points: <span id="coins">0</span></div>
+            <div class="meter">Lives: <span id="lives">3</span></div>
+          </div>
+          <div>
+            <button id="btnHelp">Help</button>
+          </div>
+        </div>
+
+        <section id="screen_home" class="screen">
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <h2 style="margin:0">World Map</h2>
+                <p style="margin:6px 0 0 0;color:var(--muted)">Pilih zona untuk memulai petualangan biologi</p>
+              </div>
+              <div class="bigMap">
+                <div style="text-align:right"><small style="color:var(--muted)">Progress</small><div id="progressBar" style="width:180px;height:10px;background:rgba(255,255,255,0.03);border-radius:6px;overflow:hidden"><div id="progressFill" style="height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2))"></div></div></div>
+              </div>
+            </div>
+
+            <div class="world-map">
+              <div class="zone" data-zone="cell" tabindex="0">
+                <h3>Micro Cell World</h3>
+                <p>Jelajahi organel, jawab soal tentang sel.</p>
+                <svg class="particle" viewBox="0 0 100 100"><circle cx="40" cy="40" r="30" fill="white"/></svg>
+              </div>
+              <div class="zone" data-zone="system">
+                <h3>Human System Lab</h3>
+                <p>Sistem organ manusia & fungsi.</p>
+                <svg class="particle" viewBox="0 0 100 100"><rect x="20" y="20" width="60" height="60"/></svg>
+              </div>
+              <div class="zone" data-zone="plant">
+                <h3>Plant Planet</h3>
+                <p>Fotosintesis & struktur tanaman.</p>
+                <svg class="particle" viewBox="0 0 100 100"><path d="M10 80 Q 50 10 90 80 Z"/></svg>
+              </div>
+              <div class="zone" data-zone="dna">
+                <h3>DNA Galaxy</h3>
+                <p>Genetika & struktur DNA.</p>
+                <svg class="particle" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40"/></svg>
+              </div>
+              <div class="zone" data-zone="eco">
+                <h3>Eco Forest Realm</h3>
+                <p>Ekologi, rantai makanan, hubungan species.</p>
+                <svg class="particle" viewBox="0 0 100 100"><ellipse cx="50" cy="50" rx="40" ry="20"/></svg>
+              </div>
+              <div class="zone" data-zone="evo">
+                <h3>Evolution Time Rift</h3>
+                <p>Proses evolusi & adaptasi.</p>
+                <svg class="particle" viewBox="0 0 100 100"><polyline points="10,80 30,20 50,60 70,10 90,80"/></svg>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="screen_play" class="screen" style="display:none">
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <h2 id="zoneTitle">Zone</h2>
+              <div><small style="color:var(--muted)">Level</small> <strong id="zoneLevel">1</strong></div>
+            </div>
+            <div style="margin-top:12px" id="gameArea">
+              <!-- Game content injected here -->
+              <div class="question" id="question">Pilih zone dahulu dari World Map.</div>
+              <div class="choices" id="choices"></div>
+            </div>
+            <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+              <button id="btnNext">Next</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="screen_minigames" class="screen" style="display:none">
+          <div class="card">
+            <h2>Mini Games</h2>
+            <p style="color:var(--muted)">Pilih mini game untuk bermain — setiap mini game memberi XP & Points.</p>
+            <div style="display:flex;gap:10px;margin-top:12px">
+              <button class="mini" data-min="jump">Organell Jump</button>
+              <button class="mini" data-min="shooter">DNA Shooter</button>
+              <button class="mini" data-min="drag">Drag & Drop Anatomy</button>
+            </div>
+            <div id="miniArea" style="margin-top:12px"></div>
+          </div>
+        </section>
+
+        <section id="screen_leader" class="screen" style="display:none">
+          <div class="card">
+            <h2>Leaderboard (Local)</h2>
+            <div id="leaderList" style="margin-top:10px"></div>
+          </div>
+        </section>
+
+        <section id="screen_credits" class="screen" style="display:none">
+          <div class="card">
+            <h2>Credits</h2>
+            <p>Dibuat oleh <strong>Nasrul & Dwi</strong> — <em>SMAN KABUH JOMBANG 2025</em></p>
+            <p style="color:var(--muted)">Terima kasih telah menggunakan BIO-QUEST. Silakan fork repo ini jika ingin mengembangkan lebih lanjut.</p>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // ---------- Data: 30+ Questions ----------
+    const QUESTIONS = {
+      cell: [
+        {q:'Organel manakah yang dikenal sebagai "pabrik energi" sel?', choices:['Ribosom','Mitokondria','Kloroplas','Retikulum Endoplasma'], a:1},
+        {q:'Bagian sel yang berfungsi menyimpan materi genetik adalah?', choices:['Mitokondria','Nukleus','Lisosom','Golgi'], a:1},
+        {q:'Struktur yang hanya ditemukan pada sel tumbuhan, bukan sel hewan?', choices:['Dinding sel','Mitokondria','Ribosom','Nukleus'], a:0},
+        {q:'Organel yang terlibat sintesis protein adalah?', choices:['Ribosom','Peroksisom','Lisosom','Kloroplas'], a:0},
+        {q:'Organel yang memodifikasi dan mengemas protein adalah?', choices:['Retikulum Endoplasma','Golgi Apparatus','Nukleus','Vakuola'], a:1}
+      ],
+      system: [
+        {q:'Sistem tubuh yang bertanggung jawab mengangkut oksigen adalah?', choices:['Sistem Pencernaan','Sistem Peredaran Darah','Sistem Saraf','Sistem Rangka'], a:1},
+        {q:'Organ utama pencernaan yang menyerap nutrisi adalah?', choices:['Lambung','Usus Halus','Hati','Pankreas'], a:1},
+        {q:'Bagian otak yang mengatur keseimbangan dan koordinasi?', choices:['Serebrum','Serebelum','Medula Oblongata','Hipotalamus'], a:1},
+        {q:'Organ yang memompa darah ke seluruh tubuh adalah?', choices:['Paru-paru','Jantung','Hati','Ginjal'], a:1},
+        {q:'Sistem yang melindungi tubuh dari patogen disebut?', choices:['Sistem Kekebalan','Sistem Peredaran','Sistem Endokrin','Sistem Muskuloskeletal'], a:0}
+      ],
+      plant: [
+        {q:'Tempat terjadinya fotosintesis pada tumbuhan adalah?', choices:['Kloroplas','Mitokondria','Vakuola','Nukleus'], a:0},
+        {q:'Gas yang dilepaskan selama fotosintesis adalah?', choices:['Karbon Dioksida','Nitrogen','Oksigen','Metana'], a:2},
+        {q:'Bagian daun yang mengontrol keluar masuknya gas disebut?', choices:['Stomata','Xilem','Floem','Epidermis'], a:0},
+        {q:'Pigmen hijau yang menangkap cahaya adalah?', choices:['Klorofil','Kartonoid','Melanin','Hemoglobin'], a:0},
+        {q:'Fotosintesis membutuhkan cahaya, water, dan ...?', choices:['Karbon Monoksida','Karbon Dioksida','Oksigen','Nitrogen'], a:1}
+      ],
+      dna: [
+        {q:'Unit dasar hereditas yang membawa informasi genetik disebut?', choices:['Kromosom','Gen','Nukleus','Protein'], a:1},
+        {q:'Basa nukleotida yang menggantikan timin pada RNA adalah?', choices:['Adenin','Urasil','Guanin','Sitosin'], a:1},
+        {q:'Pasangan basa pada DNA: Adenin berpasangan dengan?', choices:['Guanin','Timin','Sitosin','Uracil'], a:1},
+        {q:'Proses membuat salinan RNA dari DNA disebut?', choices:['Transkripsi','Translasi','Replikasi','Mutasi'], a:0},
+        {q:'Bentuk struktur DNA yang terkenal adalah?', choices:['Heliks ganda','Lattice','Ring','Triple helix'], a:0}
+      ],
+      eco: [
+        {q:'Produsen primer di ekosistem biasanya adalah?', choices:['Herbivora','Karnivora','Tumbuhan','Detritivor'], a:2},
+        {q:'Interaksi ekologis ketika satu organisme diuntungkan dan yang lain tidak terpengaruh disebut?', choices:['Mutualisme','Komensalisme','Parasitisme','Predasi'], a:1},
+        {q:'Rantai makanan: rumput -> kelinci -> serigala. Apa peran kelinci?', choices:['Konsumen primer','Produsen','Konsumen sekunder','Dekomposer'], a:0},
+        {q:'Apa yang dimaksud biodiversitas?', choices:['Keragaman genetik, spesies & ekosistem','Jumlah pohon di hutan','Jumlah predator di suatu area','Jumlah monokultur pertanian'], a:0},
+        {q:'Siklus yang melibatkan evaporasi, kondensasi, & presipitasi?', choices:['Siklus Karbon','Siklus Nitrogen','Siklus Air','Siklus Fosfor'], a:2}
+      ],
+      evo: [
+        {q:'Teori evolusi modern dikembangkan terutama oleh siapa?', choices:['Lamark','Darwin','Mendel','Huxley'], a:1},
+        {q:'Proses perubahan frekuensi gen dalam populasi disebut?', choices:['Seleksi Alam','Mutasi','Migrasi','Deriva Genetik'], a:3},
+        {q:'Adaptasi meningkatkan ... pada organisme?', choices:['Kemampuan bertahan hidup & reproduksi','Ukuran tubuh','Kecantikan','Jumlah kromosom'], a:0},
+        {q:'Fosil memberikan bukti tentang ...?', choices:['Perkembangan evolusi','Perbedaan warna','Jumlah air pada masa lalu','Makanan dinosaurus'], a:0},
+        {q:'Spesiasi adalah proses terbentuknya ...?', choices:['Spesies baru','Mutasi tunggal','Gen baru','Sel baru'], a:0}
+      ]
+    };
+
+    // ---------- State ----------
+    let state = {
+      xp: 0,
+      coins: 0,
+      lives: 3,
+      progress: 0,
+      currentZone: null,
+      qIndex: 0,
+      zoneQuestions: [],
+      zoneLevel: 1
+    };
+
+    // ---------- DOM ----------
+    const screens = Array.from(document.querySelectorAll('.screen'));
+    const menu = document.getElementById('menu');
+    const choicesEl = document.getElementById('choices');
+    const questionEl = document.getElementById('question');
+    const xpEl = document.getElementById('xp');
+    const coinsEl = document.getElementById('coins');
+    const livesEl = document.getElementById('lives');
+    const zones = document.querySelectorAll('.zone');
+    const progressFill = document.getElementById('progressFill');
+    const zoneLevelEl = document.getElementById('zoneLevel');
+    const zoneTitleEl = document.getElementById('zoneTitle');
+
+    // Game variables
+    let gameIntervals = [];
+
+    // ---------- Simple audio via WebAudio (synth) ----------
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let masterGain = audioCtx.createGain();
+    masterGain.gain.value = 0.6;
+    masterGain.connect(audioCtx.destination);
+    
+    function playTone(freq = 440, duration = 0.12, type = 'sine', vol = 0.5) {
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = type;
+      o.frequency.value = freq;
+      g.gain.value = vol;
+      o.connect(g);
+      g.connect(masterGain);
+      o.start();
+      o.stop(audioCtx.currentTime + duration);
+    }
+    
+    function successSfx() {
+      playTone(880, 0.12, 'sine', 0.2);
+      playTone(1320, 0.08, 'sine', 0.12);
+    }
+    
+    function wrongSfx() {
+      playTone(180, 0.18, 'sawtooth', 0.18);
+    }
+    
+    function clickSfx() {
+      playTone(880, 0.04, 'square', 0.06);
+    }
+
+    // ---------- Interaction ----------
+    menu.addEventListener('click', e => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      Array.from(menu.children).forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      showScreen(b.dataset.screen);
+    });
+    
+    document.getElementById('vol').addEventListener('input', e => {
+      masterGain.gain.value = e.target.value;
+    });
+    
+    document.getElementById('btnMute').addEventListener('click', () => {
+      masterGain.gain.value = 0;
+      document.getElementById('vol').value = 0;
+    });
+    
+    document.getElementById('btnTheme').addEventListener('click', () => {
+      document.body.classList.toggle('light');
+      alert('Mode tema berganti (demo)');
+    });
+    
+    document.getElementById('btnNext').addEventListener('click', () => {
+      nextQuestion();
+    });
+
+    document.getElementById('btnHelp').addEventListener('click', () => {
+      alert('BIO-QUEST Help:\n\n1. Pilih zona dari World Map\n2. Jawab pertanyaan dengan benar untuk mendapatkan XP\n3. Gunakan Nucleus Points untuk membuka fitur baru\n4. Main mini games untuk bonus XP\n5. Jaga lives Anda!');
+    });
+
+    zones.forEach(z => z.addEventListener('click', () => {
+      openZone(z.dataset.zone);
+    }));
+
+    function showScreen(name) {
+      screens.forEach(s => s.style.display = 'none');
+      document.getElementById('screen_' + name).style.display = '';
+    }
+
+    function openZone(zone) {
+      clickSfx();
+      state.currentZone = zone;
+      state.qIndex = 0;
+      state.zoneLevel = 1;
+      state.zoneQuestions = shuffleArray([...QUESTIONS[zone]]);
+      zoneTitleEl.innerText = humanize(zone);
+      zoneLevelEl.innerText = state.zoneLevel;
+      showScreen('play');
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const z = state.currentZone;
+      if (!z) {
+        questionEl.innerText = 'Pilih zone dahulu dari World Map.';
+        choicesEl.innerHTML = '';
+        return;
+      }
+      
+      const q = state.zoneQuestions[state.qIndex];
+      if (!q) {
+        // All questions answered for this zone
+        questionEl.innerText = 'Selamat! Anda telah menyelesaikan semua pertanyaan di zona ini.';
+        choicesEl.innerHTML = '';
+        state.progress += 1;
+        state.xp += 50; // Bonus for completing zone
+        state.coins += 25;
+        updateHUD();
+        updateProgress();
+        return;
+      }
+      
+      questionEl.innerText = q.q;
+      choicesEl.innerHTML = '';
+      q.choices.forEach((c, i) => {
+        const d = document.createElement('div');
+        d.className = 'choice';
+        d.innerText = c;
+        d.tabIndex = 0;
+        d.addEventListener('click', () => answer(i));
+        choicesEl.appendChild(d);
+      });
+    }
+
+    function answer(i) {
+      const q = state.zoneQuestions[state.qIndex];
+      const choices = document.querySelectorAll('.choice');
+      
+      if (typeof i !== 'number') return;
+      
+      // Remove any existing correct/wrong classes
+      choices.forEach(choice => {
+        choice.classList.remove('correct', 'wrong');
+      });
+      
+      if (i === q.a) {
+        choices[i].classList.add('correct');
+        successSfx();
+        state.xp += 10;
+        state.coins += 5;
+        state.qIndex += 1;
+        
+        // Level up every 2 questions
+        if (state.qIndex % 2 === 0) {
+          state.zoneLevel += 1;
+          zoneLevelEl.innerText = state.zoneLevel;
+        }
+        
+        setTimeout(() => {
+          renderQuestion();
+          updateHUD();
+        }, 800);
+      } else {
+        choices[i].classList.add('wrong');
+        wrongSfx();
+        state.lives -= 1;
+        updateHUD();
+        if (state.lives <= 0) {
+          gameOver();
+        }
+      }
+    }
+
+    function nextQuestion() {
+      if (!state.currentZone) return;
+      state.qIndex += 1;
+      renderQuestion();
+    }
+
+    function updateHUD() {
+      xpEl.innerText = state.xp;
+      coinsEl.innerText = state.coins;
+      livesEl.innerText = state.lives;
+    }
+
+    function updateProgress() {
+      const tot = 6;
+      const perc = Math.min(100, Math.round((state.progress / tot) * 100));
+      progressFill.style.width = perc + '%';
+    }
+
+    function gameOver() {
+      alert('Game over! Anda kehabisan nyawa. Progress disimpan ke leaderboard.');
+      saveToLeader();
+      state.xp = 0;
+      state.coins = 0;
+      state.lives = 3;
+      state.progress = 0;
+      updateHUD();
+      updateProgress();
+      showScreen('home');
+    }
+
+    function saveToLeader() {
+      const name = prompt('Masukkan nama pemain (untuk leaderboard):', 'Player');
+      if (!name) return;
+      const arr = JSON.parse(localStorage.getItem('bq_leader') || '[]');
+      arr.push({
+        name,
+        xp: state.xp,
+        coins: state.coins,
+        date: new Date().toISOString()
+      });
+      arr.sort((a, b) => b.xp - a.xp);
+      localStorage.setItem('bq_leader', JSON.stringify(arr.slice(0, 10)));
+      renderLeader();
+    }
+
+    function renderLeader() {
+      const arr = JSON.parse(localStorage.getItem('bq_leader') || '[]');
+      const el = document.getElementById('leaderList');
+      if (!el) return;
+      el.innerHTML = arr.map((r, i) => 
+        `<div style="padding:8px;border-bottom:1px dashed rgba(255,255,255,0.03)">
+          ${i + 1}. <strong>${r.name}</strong> — XP: ${r.xp} — Coins: ${r.coins} 
+          <small style="color:var(--muted);">${(new Date(r.date)).toLocaleString()}</small>
+        </div>`
+      ).join('');
+    }
+
+    // ---------- Mini games (FIXED implementations) ----------
+    document.querySelectorAll('.mini').forEach(b => b.addEventListener('click', e => {
+      const m = e.target.dataset.min;
+      startMini(m);
+      showScreen('minigames');
+    }));
+
+    // Clear all game intervals
+    function clearAllGameIntervals() {
+      gameIntervals.forEach(interval => clearInterval(interval));
+      gameIntervals = [];
+    }
+    
+    function startMini(name) {
+      const area = document.getElementById('miniArea');
+      area.innerHTML = '';
+      
+      // Clear any existing game intervals
+      clearAllGameIntervals();
+      
+      if (name === 'jump') {
+        area.innerHTML = `
+          <p><strong>Organell Jump:</strong> Tekan SPACE untuk melompati rintangan!</p>
+          <div class="game-container" id="jumpGame" tabindex="0">
+            <div class="game-player" id="player"></div>
+            <div class="game-obstacle" id="obstacle"></div>
+            <div class="game-ground"></div>
+          </div>
+          <p class="game-score">Skor: <span id="jumpScore">0</span></p>
+          <button id="endMini">Selesai</button>
+        `;
+        
+        // Focus on game container for keyboard events
+        const gameContainer = document.getElementById('jumpGame');
+        gameContainer.focus();
+        
+        // Simple jump game implementation
+        let isJumping = false;
+        let jumpScore = 0;
+        const player = document.getElementById('player');
+        const obstacle = document.getElementById('obstacle');
+        const scoreDisplay = document.getElementById('jumpScore');
+        
+        // Reset positions
+        player.style.bottom = '10px';
+        obstacle.style.right = '0px';
+        
+        // Keyboard event listener
+        const jumpHandler = function(e) {
+          if (e.code === 'Space' && !isJumping) {
+            isJumping = true;
+            player.style.bottom = '60px';
+            setTimeout(() => {
+              player.style.bottom = '10px';
+              isJumping = false;
+            }, 500);
+          }
+        };
+        
+        document.addEventListener('keydown', jumpHandler);
+        
+        // Move obstacle
+        let obstaclePos = 300;
+        obstacle.style.right = obstaclePos + 'px';
+        
+        const gameInterval = setInterval(() => {
+          obstaclePos -= 5;
+          obstacle.style.right = obstaclePos + 'px';
+          
+          if (obstaclePos <= -20) {
+            obstaclePos = 300;
+            jumpScore++;
+            scoreDisplay.textContent = jumpScore;
+          }
+          
+          // Simple collision detection
+          const playerRect = {
+            left: 50,
+            right: 70,
+            top: parseInt(player.style.bottom) + 20,
+            bottom: parseInt(player.style.bottom)
+          };
+          
+          const obstacleRect = {
+            left: 300 - obstaclePos,
+            right: 315 - obstaclePos,
+            top: 40,
+            bottom: 10
+          };
+          
+          if (playerRect.right > obstacleRect.left && 
+              playerRect.left < obstacleRect.right && 
+              playerRect.bottom < obstacleRect.top) {
+            // Collision - end game
+            clearInterval(gameInterval);
+            document.removeEventListener('keydown', jumpHandler);
+            alert(`Game Over! Skor akhir: ${jumpScore}`);
+          }
+        }, 50);
+        
+        gameIntervals.push(gameInterval);
+        
+        document.getElementById('endMini').onclick = () => {
+          clearInterval(gameInterval);
+          document.removeEventListener('keydown', jumpHandler);
+          state.xp += jumpScore * 2;
+          state.coins += Math.floor(jumpScore / 2);
+          updateHUD();
+          alert(`Selesai mini game — +${jumpScore * 2} XP`);
+        };
+      }
+      
+      else if (name === 'shooter') {
+        area.innerHTML = `
+          <p><strong>DNA Shooter:</strong> Klik DNA yang sesuai dengan pertanyaan!</p>
+          <div class="game-container" id="shooterArea"></div>
+          <p class="game-score" id="shooterQuestion">Klik DNA Heliks!</p>
+          <p class="game-score">Skor: <span id="shooterScore">0</span></p>
+          <button id="endMini2">Selesai</button>
+        `;
+        
+        // DNA Shooter game
+        let shooterScore = 0;
+        const shooterArea = document.getElementById('shooterArea');
+        const questionDisplay = document.getElementById('shooterQuestion');
+        const scoreDisplay = document.getElementById('shooterScore');
