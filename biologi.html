@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -17,35 +18,40 @@
 
         * {
             box-sizing: border-box;
-            font-family: Inter, ui-sans-serif, system-ui, Segoe UI, Roboto, 'Helvetica Neue', Arial;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         html, body {
             height: 100%;
-            margin: 0;
             background: radial-gradient(1200px 600px at 10% 10%, rgba(59, 130, 246, 0.06), transparent),
                         linear-gradient(180deg, #020412 0%, #071023 100%);
             color: #dfe9f3;
             overflow-x: hidden;
         }
 
-        .app {
-            display: flex;
-            min-height: 100vh;
-            align-items: center;
-            justify-content: center;
+        body {
             padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 1200px;
         }
 
         .shell {
-            width: 1100px;
-            max-width: 98%;
             background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
             border-radius: 18px;
             box-shadow: 0 10px 40px rgba(2, 6, 23, 0.6);
             overflow: hidden;
             display: grid;
             grid-template-columns: 360px 1fr;
+            min-height: 700px;
         }
 
         /* ---------- Sidebar ---------- */
@@ -72,6 +78,8 @@
             align-items: center;
             justify-content: center;
             font-weight: 700;
+            font-size: 20px;
+            color: white;
             box-shadow: 0 6px 18px rgba(59, 130, 246, 0.18);
         }
 
@@ -109,6 +117,7 @@
 
         .menu button:hover {
             transform: translateX(5px);
+            background: rgba(57, 240, 214, 0.05);
         }
 
         .menu button.active {
@@ -126,6 +135,7 @@
 
         input[type=range] {
             width: 100%;
+            background: transparent;
         }
 
         /* ---------- Main ---------- */
@@ -166,6 +176,7 @@
 
         .zone h3 {
             margin: 0 0 8px 0;
+            font-size: 16px;
         }
 
         .zone p {
@@ -223,7 +234,7 @@
         }
 
         .choice.wrong {
-            animation: shake 620ms;
+            animation: shake 0.6s;
         }
 
         .hud {
@@ -234,7 +245,7 @@
 
         .meter {
             background: var(--glass);
-            padding: 8px;
+            padding: 8px 12px;
             border-radius: 8px;
             font-size: 13px;
             color: var(--muted);
@@ -488,6 +499,32 @@
             animation: floatDNA 4s ease-in-out infinite;
         }
 
+        /* Button Styles */
+        button {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--accent);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background: rgba(57, 240, 214, 0.1);
+            transform: scale(1.05);
+        }
+
+        .mini {
+            background: rgba(123, 97, 255, 0.1);
+            border: 1px solid rgba(123, 97, 255, 0.2);
+        }
+
+        .mini:hover {
+            background: rgba(123, 97, 255, 0.2);
+        }
+
         /* Responsive Styles */
         @media (max-width: 900px) {
             .shell {
@@ -556,7 +593,7 @@
         }
 
         @media (max-width: 600px) {
-            .app {
+            body {
                 padding: 10px;
             }
             
@@ -589,30 +626,6 @@
             .zone {
                 padding: 12px;
             }
-        }
-
-        button {
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--accent);
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        button:hover {
-            background: rgba(57, 240, 214, 0.1);
-            transform: scale(1.05);
-        }
-
-        .mini {
-            background: rgba(123, 97, 255, 0.1);
-            border: 1px solid rgba(123, 97, 255, 0.2);
-        }
-
-        .mini:hover {
-            background: rgba(123, 97, 255, 0.2);
         }
     </style>
 </head>
@@ -923,13 +936,10 @@
             // Coba putar musik
             bgMusic.play().then(() => {
                 musicStarted = true;
-                console.log('Background music started');
                 document.getElementById('btnMusic').textContent = 'Music On';
                 document.getElementById('btnMusic').classList.add('active');
             }).catch(error => {
                 console.log('Autoplay prevented:', error);
-                // Tampilkan pesan bahwa musik tidak dapat dimulai otomatis
-                alert('Klik tombol "Music On" untuk memulai backsound.');
             });
         }
         
