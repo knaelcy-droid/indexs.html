@@ -173,14 +173,70 @@
     }
 
     /* responsive */
-    @media(max-width:900px){.shell{grid-template-columns:1fr}.sidebar{display:none}}
-  
+    @media(max-width:900px){
+      .shell{grid-template-columns:1fr}
+      .sidebar{display:none}
+      .world-map{grid-template-columns:1fr}
+      .choices{grid-template-columns:1fr}
+      .crossword-grid{grid-template-columns:repeat(10, 1fr); max-width:100%}
+      .crossword-cell{width:30px; height:30px}
+      .crossword-clues{grid-template-columns:1fr}
+      .hud{flex-wrap:wrap; justify-content:center}
+      .topbar{flex-direction:column; gap:10px}
+      .bigMap{flex-direction:column; text-align:center}
+      #progressBar{width:100%}
+    }
+    
+    @media(max-width:600px){
+      .app{padding:10px}
+      .main{padding:15px}
+      .card{padding:12px}
+      .crossword-cell{width:25px; height:25px}
+      .crossword-cell input{font-size:14px}
+      .crossword-grid{grid-template-columns:repeat(10, 1fr); gap:1px}
+      .question{font-size:16px}
+      .zone{padding:12px}
+    }
+
+    /* Mobile menu */
+    .mobile-menu-btn {
+      display: none;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--accent);
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 15px;
+    }
+    
+    @media(max-width:900px){
+      .mobile-menu-btn {
+        display: block;
+      }
+      .sidebar.mobile-open {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 100;
+        overflow-y: auto;
+      }
+    }
+
     /* --- Enhanced Animations --- */
     @keyframes floatDNA { 0%{transform:translateY(0) rotate(0deg);} 50%{transform:translateY(-12px) rotate(6deg);} 100%{transform:translateY(0) rotate(0deg);} }
     @keyframes pulseGlow { 0%{box-shadow:0 0 10px #00eaff;} 50%{box-shadow:0 0 25px #00eaff;} 100%{box-shadow:0 0 10px #00eaff;} }
     @keyframes slideFadeIn { 0%{opacity:0; transform:translateY(40px);} 100%{opacity:1; transform:translateY(0);} }
     @keyframes rotateHelix { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
     @keyframes pulseCorrect { 0%{box-shadow: 0 0 0 0 rgba(57,240,214,0.4);} 70%{box-shadow: 0 0 0 10px rgba(57,240,214,0);} 100%{box-shadow: 0 0 0 0 rgba(57,240,214,0);} }
+    @keyframes shake { 
+      0%, 100% {transform: translateX(0);} 
+      10%, 30%, 50%, 70%, 90% {transform: translateX(-5px);} 
+      20%, 40%, 60%, 80% {transform: translateX(5px);} 
+    }
 
     .dna-float { animation: floatDNA 4s ease-in-out infinite; }
     .glow-pulse { animation: pulseGlow 2.5s infinite; }
@@ -240,7 +296,7 @@
   
   <div class="app">
     <div class="shell">
-      <aside class="sidebar">
+      <aside class="sidebar" id="sidebar">
         <div class="logo">
           <div class="mark dna-float">BQ</div>
           <div>
@@ -299,6 +355,15 @@
       </aside>
 
       <main class="main">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+          Menu
+        </button>
+        
         <div class="topbar">
           <div class="hud">
             <div class="meter">XP: <span id="xp">0</span></div>
@@ -312,7 +377,7 @@
 
         <section id="screen_home" class="screen">
           <div class="card">
-            <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
               <div>
                 <h2 style="margin:0">World Map</h2>
                 <p style="margin:6px 0 0 0;color:var(--muted)">Pilih zona untuk memulai petualangan biologi</p>
@@ -394,7 +459,7 @@
 
         <section id="screen_play" class="screen" style="display:none">
           <div class="card">
-            <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
               <h2 id="zoneTitle">Zone</h2>
               <div><small style="color:var(--muted)">Level</small> <strong id="zoneLevel">1</strong></div>
             </div>
@@ -413,7 +478,7 @@
           <div class="card">
             <h2>Mini Games</h2>
             <p style="color:var(--muted)">Pilih mini game untuk bermain — setiap mini game memberi XP & Points.</p>
-            <div style="display:flex;gap:10px;margin-top:12px">
+            <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
               <button class="mini" data-min="crossword">Teka-Teki Biologi</button>
               <button class="mini" data-min="shooter">DNA Shooter</button>
               <button class="mini" data-min="drag">Drag & Drop Anatomy</button>
@@ -463,7 +528,7 @@
         {q:'Gas yang dilepaskan selama fotosintesis adalah?', choices:['Karbon Dioksida','Nitrogen','Oksigen','Metana'], a:2},
         {q:'Bagian daun yang mengontrol keluar masuknya gas disebut?', choices:['Stomata','Xilem','Floem','Epidermis'], a:0},
         {q:'Pigmen hijau yang menangkap cahaya adalah?', choices:['Klorofil','Kartonoid','Melanin','Hemoglobin'], a:0},
-        {q:'Fotosintesis membutuhkan cahaya, air, dan ...?', choices:['Karbon Monoksida','Karbon Dioksida','Oksigen','Nitrogen'], a:1}
+        {q:'Fotosintesis membutuhkan cahaya, water, dan ...?', choices:['Karbon Monoksida','Karbon Dioksida','Oksigen','Nitrogen'], a:1}
       ],
       dna: [
         {q:'Unit dasar hereditas yang membawa informasi genetik disebut?', choices:['Kromosom','Gen','Nukleus','Protein'], a:1},
@@ -513,6 +578,8 @@
     const zoneLevelEl = document.getElementById('zoneLevel');
     const zoneTitleEl = document.getElementById('zoneTitle');
     const bgMusic = document.getElementById('bgMusic');
+    const sidebar = document.getElementById('sidebar');
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
 
     // Game variables
     let gameIntervals = [];
@@ -552,21 +619,35 @@
     }
 
     // ---------- Simple audio via WebAudio (synth) ----------
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    let masterGain = audioCtx.createGain();
-    masterGain.gain.value = 0.6;
-    masterGain.connect(audioCtx.destination);
+    let audioCtx, masterGain;
+    
+    function initAudio() {
+      try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        masterGain = audioCtx.createGain();
+        masterGain.gain.value = 0.6;
+        masterGain.connect(audioCtx.destination);
+      } catch (e) {
+        console.log('Web Audio API tidak didukung:', e);
+      }
+    }
     
     function playTone(freq = 440, duration = 0.12, type = 'sine', vol = 0.5) {
-      const o = audioCtx.createOscillator();
-      const g = audioCtx.createGain();
-      o.type = type;
-      o.frequency.value = freq;
-      g.gain.value = vol;
-      o.connect(g);
-      g.connect(masterGain);
-      o.start();
-      o.stop(audioCtx.currentTime + duration);
+      if (!audioCtx) return;
+      
+      try {
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = type;
+        o.frequency.value = freq;
+        g.gain.value = vol;
+        o.connect(g);
+        g.connect(masterGain);
+        o.start();
+        o.stop(audioCtx.currentTime + duration);
+      } catch (e) {
+        console.log('Error playing tone:', e);
+      }
     }
     
     function successSfx() {
@@ -589,15 +670,19 @@
       Array.from(menu.children).forEach(x => x.classList.remove('active'));
       b.classList.add('active');
       showScreen(b.dataset.screen);
+      // Tutup menu mobile setelah memilih
+      if (window.innerWidth <= 900) {
+        sidebar.classList.remove('mobile-open');
+      }
     });
     
     document.getElementById('vol').addEventListener('input', e => {
-      masterGain.gain.value = e.target.value;
+      if (masterGain) masterGain.gain.value = e.target.value;
       bgMusic.volume = e.target.value;
     });
     
     document.getElementById('btnMute').addEventListener('click', () => {
-      masterGain.gain.value = 0;
+      if (masterGain) masterGain.gain.value = 0;
       bgMusic.volume = 0;
       document.getElementById('vol').value = 0;
     });
@@ -620,6 +705,11 @@
     zones.forEach(z => z.addEventListener('click', () => {
       openZone(z.dataset.zone);
     }));
+
+    // Mobile menu toggle
+    mobileMenuBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('mobile-open');
+    });
 
     function showScreen(name) {
       screens.forEach(s => s.style.display = 'none');
@@ -999,7 +1089,7 @@
       else if (name === 'shooter') {
         area.innerHTML = `
           <p><strong>DNA Shooter:</strong> Klik DNA yang sesuai dengan pertanyaan!</p>
-          <div class="game-container" id="shooterArea"></div>
+          <div class="game-container" id="shooterArea" style="position:relative; height:200px; border:1px solid rgba(255,255,255,0.1); border-radius:8px; overflow:hidden"></div>
           <p class="game-score" id="shooterQuestion">Klik DNA Heliks!</p>
           <p class="game-score">Skor: <span id="shooterScore">0</span></p>
           <button id="endMini2">Selesai</button>
@@ -1071,7 +1161,7 @@
       else if (name === 'drag') {
         area.innerHTML = `
           <p><strong>Drag & Drop Anatomy:</strong> Seret organ ke posisi yang benar!</p>
-          <div style="display:flex;gap:12px;margin-top:12px">
+          <div style="display:flex;gap:12px;margin-top:12px;flex-wrap:wrap">
             <div id="organs" style="width:140px;display:flex;flex-direction:column;gap:8px">
               <div class="draggable" draggable="true" data-organ="jantung" style="padding:8px;background:var(--glass);border-radius:6px;cursor:move">Jantung</div>
               <div class="draggable" draggable="true" data-organ="otak" style="padding:8px;background:var(--glass);border-radius:6px;cursor:move">Otak</div>
@@ -1165,13 +1255,14 @@
     }
 
     // ---------- Init ----------
+    initAudio();
     updateHUD();
     renderLeader();
     updateProgress();
 
     // Resume audio context on first user interact (Chrome autoplay policy)
     document.addEventListener('click', () => {
-      if (audioCtx.state === 'suspended') audioCtx.resume();
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
       startBackgroundMusic();
     }, { once: true });
   </script>
